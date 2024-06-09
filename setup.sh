@@ -10,10 +10,10 @@ echo "Initialize setup script..."
 
 # Check root running
 if [ "$EUID" -ne 0 ]; then
-    echo "Error: This script must be run as root or with sudo."
-    exit 1
+  echo "Error: This script must be run as root or with sudo."
+  exit 1
 else
-    echo "Check root privilege is OK"
+  echo "Check root privilege is OK"
 fi
 
 # Get current OS and version
@@ -25,21 +25,21 @@ CURRENT_VERSION=$(lsb_release -sr)
 
 # Function to check if CURRENT_VERSION is in the VERSION_SUPPORT array
 is_version_valid() {
-    local version=$1
-    for v in "${VERSION_SUPPORT[@]}"; do
-        if [[ "$v" == "$version" ]]; then
-            return 0
-        fi
-    done
-    return 1
+  local version=$1
+  for v in "${VERSION_SUPPORT[@]}"; do
+    if [[ "$v" == "$version" ]]; then
+      return 0
+    fi
+  done
+  return 1
 }
 
 # Check OS compatition
 if [[ "$CURRENT_OS" == "$OS_SUPPORT" ]] && is_version_valid "$CURRENT_VERSION"; then
-    echo "Current OS is $CURRENT_OS $CURRENT_VERSION"
+  echo "Current OS is $CURRENT_OS $CURRENT_VERSION"
 else
-    echo "This script is only available with $required_os versions ${required_versions[*]}"
-    exit 1
+  echo "This script is only available with $required_os versions ${required_versions[*]}"
+  exit 1
 fi
 
 sleep 1
@@ -69,8 +69,8 @@ echo "Find network config file..."
 NETWORK_FILE=$(find /etc/netplan -type f -name '*.yaml' | head -n1)
 
 if [ -z "$NETWORK_FILE" ]; then
-    echo "Error: No network config file found in /etc/netplan"
-    exit 1
+  echo "Error: No network config file found in /etc/netplan"
+  exit 1
 fi
 
 echo "Found network config at $NETWORK_FILE"
@@ -79,13 +79,13 @@ echo "Found network config at $NETWORK_FILE"
 # ```
 # network:
 #   ethernets:
-#     ens33:
-#       addresses:
-#         - 192.168.24.120/24
-#       gateway4: 192.168.24.2
-#       nameservers:
-#         addresses: [8.8.8.8, 8.8.4.4]
-#         search: []
+#   ens33:
+#     addresses:
+#     - 192.168.24.120/24
+#     gateway4: 192.168.24.2
+#     nameservers:
+#     addresses: [8.8.8.8, 8.8.4.4]
+#     search: []
 #   version: 2
 # ```
 
@@ -96,8 +96,8 @@ DEFAULT_GATEWAY=$(awk '/gateway4:/{print $2}' $NETWORK_FILE)
 DEFAULT_NAMESERVERS=$(awk '/nameservers:/ {getline; print $2,$3}' /etc/netplan/00-installer-config.yaml | tr -d '[]')
 
 if [ -z "$DEFAULT_IP" ] || [ -z "$DEFAULT_NETMASK" ] || [ -z "$DEFAULT_GATEWAY" ] || [ -z "$DEFAULT_NAMESERVERS" ]; then
-    echo "Failed to get network configuration from NETWORK_FILE"
-    exit 1
+  echo "Failed to get network configuration from NETWORK_FILE"
+  exit 1
 fi
 
 read -p "Enter new IP address (default: $DEFAULT_IP): " IP
@@ -114,13 +114,13 @@ echo "Configure static IP to $IP/$NETMASK $GATEWAY"
 cat <<EOF > $NETWORK_FILE
 network:
   ethernets:
-    ens33:
-      addresses:
-        - $IP/$NETMASK
-      gateway4: $GATEWAY
-      nameservers:
-        addresses: [$NAMESERVERS]
-        search: []
+  ens33:
+    addresses:
+    - $IP/$NETMASK
+    gateway4: $GATEWAY
+    nameservers:
+    addresses: [$NAMESERVERS]
+    search: []
   version: 2
 EOF
 
@@ -136,16 +136,16 @@ echo "Check GPT PMBR size..."
 GPT_CHECK=$(fdisk -l 2>&1 | grep "GPT PMBR size mismatch")
 
 if [ -n "$GPT_CHECK" ]; then
-    echo "$GPT_CHECK"
+  echo "$GPT_CHECK"
 else
-    echo "GPT PMBR is OK"
+  echo "GPT PMBR is OK"
 fi
 
 # Resizing disk and LVM
 if [ -n "$GPT_CHECK" ]; then
-    echo "Resizing disk and LVM..."
-    growpart /dev/sda 3
-    lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+  echo "Resizing disk and LVM..."
+  growpart /dev/sda 3
+  lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
 fi
 
 sleep 1
