@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# Note:
-# fix find os ver and exit
-
-# =====================================================
+echo "====================================================="
 
 # Print banner
 echo "[Info] Initialize setup script..."
@@ -34,9 +31,9 @@ check_version() {
   return 1
 }
 
-# Check OS compatition
+# Check OS compatible
 if [[ "$CURRENT_OS" == "$OS_SUPPORT" ]] && check_version "$CURRENT_VERSION"; then
-  echo "[OK] Current OS is $CURRENT_OS $CURRENT_VERSION"
+  echo "[OK] Current OS version $CURRENT_OS $CURRENT_VERSION is compatible"
 else
   echo "[Error] This script is only available with $required_os versions ${required_versions[*]}"
   exit 1
@@ -44,7 +41,7 @@ fi
 
 sleep 1
 
-# =====================================================
+echo "====================================================="
 
 # Find current hostname
 echo "[Info] Find current hostname..."
@@ -62,7 +59,7 @@ sed -i "s/127.0.1.1 $DEFAULT_HOSTNAME/127.0.1.1 $HOSTNAME/g" /etc/hosts
 
 sleep 1
 
-# =====================================================
+echo "====================================================="
 
 # Find network config file
 echo "[Info] Find network config file..."
@@ -128,7 +125,7 @@ netplan apply
 
 sleep 1
 
-# =====================================================
+echo "====================================================="
 
 # Check GPT PMBR size mismatch
 echo "[Info] Check GPT PMBR size..."
@@ -150,7 +147,7 @@ fi
 
 sleep 1
 
-# =====================================================
+echo "====================================================="
 
 # Update package lists
 echo "[Info] Update package lists and upgrade packages..."
@@ -171,6 +168,6 @@ fi
 
 sleep 1
 
-# =====================================================
+echo "====================================================="
 
 echo "[Info] Setup complete!"
