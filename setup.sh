@@ -72,20 +72,6 @@ fi
 
 echo "[OK] Found network config at $NETWORK_FILE"
 
-# With /etc/netplan/00-installer-config.yaml template as follow:
-# ```
-# network:
-#   ethernets:
-#   ens33:
-#     addresses:
-#     - 192.168.24.120/24
-#     gateway4: 192.168.24.2
-#     nameservers:
-#     addresses: [8.8.8.8, 8.8.4.4]
-#     search: []
-#   version: 2
-# ```
-
 # Configure static IP
 DEFAULT_IP=$(awk '/addresses:/{getline; print $2}' $NETWORK_FILE | head -n 1 | cut -d'/' -f1)
 DEFAULT_NETMASK=$(awk '/addresses:/{getline; print $2}' $NETWORK_FILE | head -n 1 | cut -d'/' -f2)
@@ -108,16 +94,30 @@ NAMESERVERS=${NAMESERVERS:-$DEFAULT_NAMESERVERS}
 
 echo "[OK] Configure static IP to $IP/$NETMASK $GATEWAY"
 
+# With /etc/netplan/00-installer-config.yaml template as follow:
+# ```
+# network:
+#   ethernets:
+#     ens33:
+#       addresses:
+#         - 192.168.24.120/24
+#       gateway4: 192.168.24.2
+#       nameservers:
+#         addresses: [8.8.8.8, 8.8.4.4]
+#         search: []
+#   version: 2
+# ```
+
 cat <<EOF > $NETWORK_FILE
 network:
   ethernets:
-  ens33:
-    addresses:
-    - $IP/$NETMASK
-    gateway4: $GATEWAY
-    nameservers:
-    addresses: [$NAMESERVERS]
-    search: []
+    ens33:
+      addresses:
+        - $IP/$NETMASK
+      gateway4: $GATEWAY
+      nameservers:
+        addresses: [$NAMESERVERS]
+        search: []
   version: 2
 EOF
 
