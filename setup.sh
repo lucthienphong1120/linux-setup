@@ -16,8 +16,31 @@ else
     echo "Check root privilege is OK"
 fi
 
+# Get current OS and version
+echo "Get current OS and version..."
+OS_SUPPORT="Ubuntu"
+VERSION_SUPPORT=("22.04" "24.04")
+CURRENT_OS=$(lsb_release -si)
+CURRENT_VERSION=$(lsb_release -sr)
+
+# Function to check if CURRENT_VERSION is in the VERSION_SUPPORT array
+is_version_valid() {
+    local version=$1
+    for v in "${VERSION_SUPPORT[@]}"; do
+        if [[ "$v" == "$version" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 # Check OS compatition
-echo "This script is only available with Ubuntu 22.04"
+if [[ "$CURRENT_OS" == "$OS_SUPPORT" ]] && is_version_valid "$CURRENT_VERSION"; then
+    echo "Current OS is $CURRENT_OS $CURRENT_VERSION"
+else
+    echo "This script is only available with $required_os versions ${required_versions[*]}"
+    exit 1
+fi
 
 sleep 1
 
