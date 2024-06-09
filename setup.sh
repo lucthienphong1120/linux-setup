@@ -2,7 +2,6 @@
 
 # Note:
 # fix find os ver and exit
-# find network card name and ip
 
 # =====================================================
 
@@ -53,16 +52,39 @@ fi
 
 echo "Found network config at $NETWORK_FILE"
 
+# With /etc/netplan/00-installer-config.yaml template as follow:
+# ```
+# network:
+#   ethernets:
+#     ens33:
+#       addresses:
+#         - 192.168.24.120/24
+#       gateway4: 192.168.24.2
+#       nameservers:
+#         addresses: [8.8.8.8, 8.8.4.4]
+#         search: []
+#   version: 2
+# ```
+
 # Configure static IP
-DEFAULT_IP="192.168.24.120"
-DEFAULT_NETMASK="24"
-DEFAULT_GATEWAY="192.168.24.2"
+DEFAULT_IP=$(awk '/addresses:/{getline; print $2}' $NETWORK_FILE | head -n 1 | cut -d'/' -f1)
+DEFAULT_NETMASK=$(awk '/addresses:/{getline; print $2}' $NETWORK_FILE | head -n 1 | cut -d'/' -f2)
+DEFAULT_GATEWAY=$(awk '/gateway4:/{print $2}' $NETWORK_FILE)
+DEFAULT_NAMESERVERS=$(awk '/nameservers:/ {getline; print $2,$3}' /etc/netplan/00-installer-config.yaml | tr -d '[]')
+
+if [ -z "$DEFAULT_IP" ] || [ -z "$DEFAULT_NETMASK" ] || [ -z "$DEFAULT_GATEWAY" ] || [ -z "$DEFAULT_NAMESERVERS" ]; then
+    echo "Failed to get network configuration from NETWORK_FILE"
+    exit 1
+fi
+
 read -p "Enter new IP address (default: $DEFAULT_IP): " IP
 IP=${IP:-$DEFAULT_IP}
 read -p "Enter new netmask (default: $DEFAULT_NETMASK): " NETMASK
 NETMASK=${NETMASK:-$DEFAULT_NETMASK}
 read -p "Enter new gateway (default: $DEFAULT_GATEWAY): " GATEWAY
 GATEWAY=${GATEWAY:-$DEFAULT_GATEWAY}
+read -p "Enter new gateway (default: $DEFAULT_NAMESERVERS): " NAMESERVERS
+NAMESERVERS=${NAMESERVERS:-$DEFAULT_NAMESERVERS}
 
 echo "Configure static IP to $IP/$NETMASK $GATEWAY"
 
@@ -74,7 +96,7 @@ network:
         - $IP_ADDRESS/$NETMASK
       gateway4: $GATEWAY
       nameservers:
-        addresses: [8.8.8.8, 8.8.4.4]
+        addresses: [$NAMESERVERS]
         search: []
   version: 2
 EOF
