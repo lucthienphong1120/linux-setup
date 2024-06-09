@@ -17,4 +17,5 @@ bash setup.sh
 
 ## Screenshot
 
-![image](https://github.com/lucthienphong1120/linux-setup/assets/90561566/aa548602-54e2-459d-b4d3-df973f858d93)
+![image](https://github.com/lucthienphong1120/linux-setup/assets/90561566/51b10e13-84df-40ed-b39e-2cb3f037c802)
+
