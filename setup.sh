@@ -35,7 +35,7 @@ echo "Set hostname to $HOSTNAME"
 
 hostnamectl set-hostname $HOSTNAME
 sed -i "s/127.0.1.1 $DEFAULT_HOSTNAME/127.0.1.1 $HOSTNAME/g" /etc/hosts
-exec bash
+#exec bash
 
 sleep 1
 
@@ -93,7 +93,7 @@ network:
   ethernets:
     ens33:
       addresses:
-        - $IP_ADDRESS/$NETMASK
+        - $IP/$NETMASK
       gateway4: $GATEWAY
       nameservers:
         addresses: [$NAMESERVERS]
