@@ -179,7 +179,6 @@ CONFIRM=${CONFIRM:-$DEFAULT_CONFIRM}
 if [[ "$CONFIRM" =~ ^[Yy]$ ]]; then
   netplan apply
   exec bash
-  reboot
 fi
 
 echo "====================================================="
