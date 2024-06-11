@@ -91,7 +91,7 @@ read -p "Enter new netmask (default: $DEFAULT_NETMASK): " NETMASK
 NETMASK=${NETMASK:-$DEFAULT_NETMASK}
 read -p "Enter new gateway (default: $DEFAULT_GATEWAY): " GATEWAY
 GATEWAY=${GATEWAY:-$DEFAULT_GATEWAY}
-read -p "Enter new gateway (default: $DEFAULT_NAMESERVERS): " NAMESERVERS
+read -p "Enter new nameservers (default: $DEFAULT_NAMESERVERS): " NAMESERVERS
 NAMESERVERS=${NAMESERVERS:-$DEFAULT_NAMESERVERS}
 
 echo "[OK] Configure static IP to $IP/$NETMASK $GATEWAY"
