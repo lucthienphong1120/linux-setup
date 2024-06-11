@@ -79,12 +79,22 @@ DEFAULT_NETMASK=$(awk '/addresses:/{getline; print $2}' $NETWORK_FILE | head -n 
 DEFAULT_GATEWAY=$(awk '/gateway4:/{print $2}' $NETWORK_FILE)
 DEFAULT_NAMESERVERS=$(awk '/nameservers:/ {getline; print $2,$3}' /etc/netplan/00-installer-config.yaml | tr -d '[]')
 
+# Rewrite DEFAULT_ if cannot get data from file
+DEFAULT_NETMASK=${DEFAULT_NETMASK:-"24"}
+DEFAULT_NAMESERVERS=${DEFAULT_NAMESERVERS:-"8.8.8.8, 8.8.4.4"}
+
+if [ -z "$DEFAULT_NETCARD" ]; then
+  echo "[Error] Cannot get infomation of network card"
+  exit 1
+else
+  echo "[Info] Configure static IP for $DEFAULT_NETCARD"
+fi
+
 if [ -z "$DEFAULT_IP" ] || [ -z "$DEFAULT_NETMASK" ] || [ -z "$DEFAULT_GATEWAY" ] || [ -z "$DEFAULT_NAMESERVERS" ]; then
   echo "[Error] Failed to get network configuration from NETWORK_FILE"
   exit 1
 fi
 
-echo "[Info] Configure static IP for $DEFAULT_NETCARD"
 read -p "Enter new IP address (default: $DEFAULT_IP): " IP
 IP=${IP:-$DEFAULT_IP}
 read -p "Enter new netmask (default: $DEFAULT_NETMASK): " NETMASK
@@ -94,7 +104,7 @@ GATEWAY=${GATEWAY:-$DEFAULT_GATEWAY}
 read -p "Enter new nameservers (default: $DEFAULT_NAMESERVERS): " NAMESERVERS
 NAMESERVERS=${NAMESERVERS:-$DEFAULT_NAMESERVERS}
 
-echo "[OK] Configure static IP to $IP/$NETMASK $GATEWAY"
+echo "[OK] Configure static IP to $IP/$NETMASK $GATEWAY and NS to $NAMESERVERS"
 
 # With /etc/netplan/00-installer-config.yaml template as follow:
 # ```
