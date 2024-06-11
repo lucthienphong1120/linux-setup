@@ -123,7 +123,8 @@ network:
   version: 2
 EOF
 
-netplan apply
+# move to final stage
+# netplan apply
 
 sleep 1
 
@@ -169,6 +170,17 @@ if [[ "$UPGRADE" =~ ^[Yy]$ ]]; then
 fi
 
 sleep 1
+
+echo "====================================================="
+
+DEFAULT_CONFIRM="y"
+read -p "Confirm all changes [y/n] (default: $DEFAULT_CONFIRM): " CONFIRM
+CONFIRM=${CONFIRM:-$DEFAULT_CONFIRM}
+if [[ "$CONFIRM" =~ ^[Yy]$ ]]; then
+  netplan apply
+  exec bash
+  reboot
+fi
 
 echo "====================================================="
 
