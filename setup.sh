@@ -177,6 +177,9 @@ DEFAULT_CONFIRM="y"
 read -p "Confirm all changes [y/n] (default: $DEFAULT_CONFIRM): " CONFIRM
 CONFIRM=${CONFIRM:-$DEFAULT_CONFIRM}
 if [[ "$CONFIRM" =~ ^[Yy]$ ]]; then
+  echo "[Info] If you are using SSH to config, the connection will be disconnected by IP change"
+  echo "[Info] If the above configuration is OK, everything will work correctly! You can exit now."
+  sleep 1
   netplan apply
   exec bash
 fi
