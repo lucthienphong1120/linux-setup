@@ -73,6 +73,7 @@ fi
 echo "[OK] Found network config at $NETWORK_FILE"
 
 # Configure static IP
+DEFAULT_NETCARD=$(awk '/ethernets:/{getline; print $1}' /etc/netplan/00-installer-config.yaml | tr -d ':')
 DEFAULT_IP=$(awk '/addresses:/{getline; print $2}' $NETWORK_FILE | head -n 1 | cut -d'/' -f1)
 DEFAULT_NETMASK=$(awk '/addresses:/{getline; print $2}' $NETWORK_FILE | head -n 1 | cut -d'/' -f2)
 DEFAULT_GATEWAY=$(awk '/gateway4:/{print $2}' $NETWORK_FILE)
@@ -83,6 +84,7 @@ if [ -z "$DEFAULT_IP" ] || [ -z "$DEFAULT_NETMASK" ] || [ -z "$DEFAULT_GATEWAY" 
   exit 1
 fi
 
+echo "[Info] Configure static IP for $DEFAULT_NETCARD"
 read -p "Enter new IP address (default: $DEFAULT_IP): " IP
 IP=${IP:-$DEFAULT_IP}
 read -p "Enter new netmask (default: $DEFAULT_NETMASK): " NETMASK
@@ -111,7 +113,7 @@ echo "[OK] Configure static IP to $IP/$NETMASK $GATEWAY"
 cat <<EOF > $NETWORK_FILE
 network:
   ethernets:
-    ens33:
+    $DEFAULT_NETCARD:
       addresses:
         - $IP/$NETMASK
       gateway4: $GATEWAY
